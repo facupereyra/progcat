@@ -160,13 +160,14 @@ curry⇔ = curry→ , curry←
 --------------------------------------
 {- Ejercicios -}
 ∨∧→ : {P Q R : prop} → (P ∨ Q → R) → ((P → R) ∧ (Q → R))
-∨∧→ = {!!}
+∨∧→ prop = (λ x → prop (left x)) , (λ x → prop (right x))
 
 ∨∧← : {P Q R : prop} → ((P → R) ∧ (Q → R)) → (P ∨ Q → R) 
-∨∧← x y = {!!}
+∨∧← (pr , qr) (left p) = pr p
+∨∧← (pr , qr) (right q) = qr q
 
 ∨∧ : {P Q R : prop} → (P ∨ Q → R) ⇔ ((P → R) ∧ (Q → R))
-∨∧ = {!!}
+∨∧ = ∨∧→ , ∨∧←
 ----------------------------------------
 
 {- Introducimos la negación
@@ -185,18 +186,20 @@ contrapos pq nq p = nq (pq p)
 -----------------------------------------------
 {- Ejercicio: paradoja -}
 paradox : {P : prop} → ¬ (P ⇔ ¬ P) 
-paradox psiinop = {!!}
+paradox (pnp , npp) = pnp (npp (λ x → pnp x x)) (npp (λ x → pnp x x))
 
 {- Ejercicio: Probamos las leyes de de Morgan -}
 
 deMorgan¬∨ : {P Q : prop} → ¬ (P ∨ Q) → ¬ P ∧ ¬ Q 
-deMorgan¬∨ npq = {!!} 
+deMorgan¬∨ npoq = (λ x → npoq (left x)) , (λ x → npoq (right x)) 
   
 deMorgan¬∧¬ : {P Q : prop} → (¬ P) ∧ (¬ Q) → ¬ (P ∨ Q)
-deMorgan¬∧¬ npnq poq = {!!}
+deMorgan¬∧¬ (np , nq) (left p) = np p
+deMorgan¬∧¬ (np , nq) (right q) = nq q
   
 deMorgan¬∨¬ : {P Q : prop} → (¬ P) ∨ (¬ Q) → ¬ (P ∧ Q)
-deMorgan¬∨¬ nponq = {!!}
+deMorgan¬∨¬ (left np) = λ x → np (fst x)
+deMorgan¬∨¬ (right nq) = λ x → nq (snd x)
 
 deMorgan¬∧ : {P Q : prop} → ¬ (P ∧ Q) → (¬ P) ∨ (¬ Q)
 deMorgan¬∧ npq = {!!}
@@ -298,31 +301,34 @@ unprovable
 {- ¬ (∃ x:A. P x) ⇔ ∀ x:A. ¬ P x -}
 deMorgan¬∃ : {A : Set}{P : A → prop} →
            ¬ (∃ A (λ x → P x)) → ((x : A) → ¬ (P x))
-deMorgan¬∃ = {!!}
+deMorgan¬∃ neap a pa = neap (a , pa)
 
 deMorgan∀¬ : {A : Set}{P : A → prop} →
            ((x : A) → ¬ (P x)) → ¬ (∃ A (λ x → P x))
-deMorgan∀¬ f x = {!!} 
+deMorgan∀¬ f (a , p) = f a p 
 
-{- ¬ (∀ x:A. P x) ⇔ ∃ x:A . ¬ P x -}
+{- ¬ (∀ x:A. P x) ⇔ ∃ x:A . ¬ P x
 deMorgan¬∀ : {A : Set}{P : A → prop} →
              ¬ ((x : A) → P x) → ∃ A (λ x → ¬ (P x))
-deMorgan¬∀ x = {!!}
+deMorgan¬∀ x = {!!} 
+
+No se puede probar
+-}
 
 deMorgan∃¬ : {A : Set}{P : A → prop} →
            ∃ A (λ x → ¬ (P x)) → ¬ ((x : A) → P x)
-deMorgan∃¬ x np = {!!}
+deMorgan∃¬ (a , np) p = np (p a)
 
 --------------------------------------------------
 {- relación entre ∀ y ∃ -}
 
 curry∀→ : {A : Set}{P : A → Set}{Q : prop}
          → ((∃ A P) → Q) → (a : A) → P a → Q
-curry∀→ x = {!!}
+curry∀→ f a p = f (a , p)
 
 curry∀← : {A : Set}{P : A → Set}{Q : prop}
          → ((a : A) → P a → Q) → ((∃ A P) → Q)
-curry∀← x e = {!!}
+curry∀← f (a , p) = f a p
 
 --------------------------------------------------
 -- Ejercicios adicionales
@@ -391,3 +397,4 @@ app¬¬ = {!!}
 
 ¬¬deMorgan¬∧ : {P Q : prop} → ¬ (P ∧ Q) → ¬¬ ((¬ P) ∨ (¬ Q))
 ¬¬deMorgan¬∧ = {!!}
+ 
