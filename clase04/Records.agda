@@ -72,6 +72,17 @@ open ≡-Reasoning
 
 open import Data.Product renaming (proj₁ to fst; proj₂ to snd)
 
+cartMonoid : Monoid -> Monoid -> Monoid
+cartMonoid M N = record
+    { Carrier = Carrier₁ × Carrier₂ 
+      ; _∙_ = λ {(x , y) (w , z) -> (x ∙₁ w , y ∙₂ z)} 
+      ; ε = (ε₁ , ε₂) 
+      ; lid = cong₂ _,_ lid₁ lid₂ 
+      ; rid = cong₂ _,_ rid₁ rid₂ 
+      ; assoc = cong₂ _,_ assoc₁ assoc₂ 
+    }
+    where open Monoid M renaming (Carrier to Carrier₁ ; ε to ε₁ ; _∙_ to _∙₁_ ; lid to lid₁ ; rid to rid₁ ; assoc to assoc₁)
+          open Monoid N renaming (Carrier to Carrier₂ ; ε to ε₂ ; _∙_ to _∙₂_ ; lid to lid₂ ; rid to rid₂ ; assoc to assoc₂)
 --------------------------------------------------
 open import Function
 
@@ -133,7 +144,9 @@ rep-is-monoid-homo {M} = record {
 length : {A : Set} → List A → ℕ
 length [] = 0
 length (x ∷ xs) = 1 + length xs
--}            
+-}
+
+
 --------------------------------------------------
 {- Ejercicio: Probar que multiplicar por una constante es un es un homorfismo de NatMonoid -}
 
