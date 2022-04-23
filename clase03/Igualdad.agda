@@ -84,7 +84,7 @@ sym : {A : Set} → {a b : A} → a ≡ b → b ≡ a
 sym refl = refl 
 
 trans : {A : Set}{a b c : A} → a ≡ b → b ≡ c → a ≡ c
-trans refl q = q
+trans refl refl = refl
 
 {- Las funciones respetan la igualdad: -}
 
@@ -99,10 +99,10 @@ subst P {a} {.a} refl x = x
 {- Probar sym y trans usando subst -}
 
 sym' : {A : Set} → {a b : A} → a ≡ b → b ≡ a
-sym' {a = a} p = subst {!!} {!!} {!!}
+sym' {a = a} p = subst (λ x → x ≡ a) p refl
 
 trans' : {A : Set}{a b c : A} → a ≡ b → b ≡ c → a ≡ c
-trans' {a = a} ab bc = subst {!!} {!!} {!!}
+trans' {a = a} ab bc = subst (λ x → a ≡ x) bc ab
 
 --------------------------------------------------
 
