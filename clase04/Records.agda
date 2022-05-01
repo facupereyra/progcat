@@ -36,7 +36,7 @@ record Monoid : Set₁  where
 -}
 
 open import Data.Nat
-open import Data.Nat.Properties using (+-identityʳ ; +-assoc)
+open import Data.Nat.Properties using (+-identityʳ ; +-assoc ; *-distribʳ-+ )
 
 -- Monoide de Naturales y suma
 
@@ -158,11 +158,21 @@ length [] = 0
 length (x ∷ xs) = 1 + length xs
 -}
 
+aux : {X : Set} → {x y : List X} → length (x ++ y) ≡ length x + length y
+aux {x = []} {y} = refl
+aux {x = x ∷ xs} {y} = cong suc (aux {x = xs} {y = y})
 
+length-is-monoid-homo : {X : Set} → Is-Monoid-Homo (ListMonoid X) NatMonoid length
+length-is-monoid-homo {X} = record {
+  preserves-unit = refl ;
+  preserves-mult = λ {x} {y} → aux {X} {x} {y}}
 --------------------------------------------------
 {- Ejercicio: Probar que multiplicar por una constante es un es un homorfismo de NatMonoid -}
 
-
+multconst-is-monoid-homo : {c : ℕ} → Is-Monoid-Homo NatMonoid NatMonoid (_* c)
+multconst-is-monoid-homo {c} = record {
+  preserves-unit = refl ;
+  preserves-mult = λ {x} {y} → *-distribʳ-+ c x y }
 --------------------------------------------------
 module Foldr (M : Monoid) where
 
@@ -170,10 +180,27 @@ module Foldr (M : Monoid) where
 
  {- Ejercicio : Definir foldr y probar que (foldr _∙_ ε) es un homorfismo de monoides -}
 
-{-
- foldr : {A B : Set} → (A → B → B) → B → List A → B
- foldr _⊗_ e xs = {!   !}
--}
+ myFoldr : {A B : Set} → (A → B → B) → B → List A → B
+ myFoldr _⊗_ e [] = e
+ myFoldr _⊗_ e (x ∷ xs) = x ⊗ (myFoldr _⊗_ e xs)
+ 
+ foldr-preserves-mult : {x y : List Carrier} → myFoldr _∙_ ε (x ++ y) ≡ myFoldr _∙_ ε x ∙ myFoldr _∙_ ε y
+ foldr-preserves-mult {[]} {y} = sym lid
+ foldr-preserves-mult {x ∷ xs} {y} = 
+  begin
+   x ∙ myFoldr _∙_ ε (xs ++ y)
+  ≡⟨ cong (x ∙_) (foldr-preserves-mult {xs} {y}) ⟩
+   x ∙ (myFoldr _∙_ ε xs ∙ myFoldr _∙_ ε y)
+  ≡⟨ sym assoc ⟩
+   (x ∙ myFoldr _∙_ ε xs) ∙ myFoldr _∙_ ε y
+  ∎
+
+ foldr-is-monoid-homo : Is-Monoid-Homo (ListMonoid Carrier) M (myFoldr _∙_ ε)
+ foldr-is-monoid-homo = record {
+   preserves-unit = refl ;
+   preserves-mult = λ {x} {y} → foldr-preserves-mult {x} {y} }
+ 
+
 --------------------------------------------------
 
 {- Isomorfismos entre conjuntos -}

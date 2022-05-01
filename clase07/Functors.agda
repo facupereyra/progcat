@@ -110,11 +110,32 @@ MaybeF = functor Maybe
 -- Ejercicio: Funtor Lista
 open import Data.List.Base using (List ; [] ; _∷_) renaming (map to mapList) public
 
+ListF-Id : {A : Set} → (x : List A) → mapList (iden Sets) x ≅ iden Sets x
+ListF-Id [] = refl
+ListF-Id (x ∷ xs) = proof
+   mapList (iden Sets) (x ∷ xs)
+  ≅⟨ refl ⟩
+   (iden Sets) x ∷ mapList (iden Sets) xs
+  ≅⟨ refl ⟩
+   x ∷ mapList (iden Sets) xs
+  ≅⟨ cong (λ y → x ∷ y) (ListF-Id xs) ⟩
+   iden Sets (x ∷ xs)
+  ∎
+
+ListF-Comp : {X Y Z : Set} {f : Y → Z} {g : X → Y} → (x : List X) →
+      mapList (f ∘ g) x ≅ mapList f (mapList g x)
+ListF-Comp [] = refl
+ListF-Comp {f = f} {g = g} (x ∷ xs) = proof
+   f (g x) ∷ mapList (λ y → f (g y)) xs
+  ≅⟨ cong (f (g x) ∷_) (ListF-Comp xs) ⟩
+   f (g x) ∷ mapList f (mapList g xs)
+  ∎
+
 ListF : Fun Sets Sets
 ListF = functor List
                 mapList
-                {!!}
-                {!!}
+                (ext ListF-Id)
+                (ext ListF-Comp)
 
 -- Ejercicio EXTRA: Bifuntor de árboles con diferente información en nodos y hojas
 data Tree (A B : Set) : Set where
