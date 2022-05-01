@@ -173,19 +173,77 @@ suma-equiv' x (suc y) =
 intentar que la prueba sea legible usando ≡-Reasoning
 -}
 +-comm : (m n : ℕ) → m + n ≡ n + m
-+-comm m n = {!!}
++-comm m zero = +0 m
++-comm m (suc n) = 
+  begin
+   m + suc n
+  ≡⟨ +suc m n ⟩
+   suc (m + n)
+  ≡⟨ cong suc (+-comm m n) ⟩
+   suc (n + m)
+  ≡⟨ refl ⟩
+   suc n + m
+  ∎
 
 +-assoc : (m n l : ℕ) → m + (n + l) ≡ (m + n) + l
-+-assoc m n l = {!!}
++-assoc m zero l = 
+  begin
+   m + (zero + l)
+  ≡⟨ refl ⟩
+   m + l
+  ≡⟨ cong (λ x → x + l) (sym(+0 m)) ⟩
+   (m + zero) + l
+  ∎
+
++-assoc m (suc n) l = begin
+   m + suc (n + l)
+  ≡⟨ +suc m (n + l) ⟩
+   suc (m + (n + l))
+  ≡⟨ cong suc (+-assoc m n l) ⟩
+   suc (m + n) + l
+  ≡⟨ cong (λ x → x + l) (sym ( +suc m n )) ⟩
+   m + suc n + l
+  ∎
 
 *0 : ∀ m → 0 ≡ m * 0
-*0 m = {!   !}
+*0 zero = refl
+*0 (suc m) = *0 m
 
+--suc (m + (n + m * n)) ≡ suc (n + m * suc n)
 *suc : (m n : ℕ) → m + m * n ≡ m * suc n
-*suc m n = {!   !} 
+*suc zero n = refl
+*suc (suc m) n = 
+  begin
+   suc m + (suc m) * n
+  ≡⟨ refl ⟩
+   suc m + ( n + m * n)
+  ≡⟨ +-assoc (suc m) n (m * n) ⟩
+    (suc m + n) + (m * n)
+  ≡⟨ refl ⟩
+    (suc (m + n)) + m * n
+  ≡⟨ cong (λ x → suc x + m * n) ((+-comm m n)) ⟩
+    (suc (n + m)) + m * n
+  ≡⟨ sym( +-assoc (suc n) m (m * n)) ⟩
+    suc n + (m + m * n)
+  ≡⟨ cong (λ x → (suc n) + x) (*suc m n) ⟩
+    suc n + m * suc n
+  ≡⟨ refl ⟩
+   suc m * suc n
+  ∎ 
 
+--+suc : (m n : ℕ) → m + suc n ≡ suc (m + n)
 *-comm : (m n : ℕ) → m * n ≡ n * m
-*-comm m n = {!   !}
+*-comm zero n = *0 n
+*-comm (suc m) n = 
+  begin
+   (suc m) * n
+  ≡⟨ refl ⟩
+   n + m * n
+  ≡⟨ cong (λ x → n + x) (*-comm m n) ⟩
+   n + n * m
+  ≡⟨ *suc n m ⟩
+   n * suc m
+  ∎
 
 {- 
 Decidibilidad 
@@ -362,7 +420,7 @@ _$- : {A : Set} {B : A → Set} → ((x : A) → B x) → ({x : A} → B x)
 f $- = f _
 
 implicit-extensionality : Extensionality → ExtensionalityImplicit
-implicit-extensionality ext f≅g = {!   !}
+implicit-extensionality ext f≅g = {!  !}
 
 iext : ExtensionalityImplicit
 iext = {!   !}
@@ -401,3 +459,4 @@ m ≡₂ n = mod₂ m ≡ mod₂ n
 
 _≡₂?_ : (m n : ℕ) → Dec (m ≡₂ n)
 m ≡₂? n = {!   !}
+  

@@ -59,7 +59,19 @@ open NatMonoid
 {- Ejercicio: Probar que las listas son un monoide -}
 
 open ≡-Reasoning
+open import Data.List
+open import Data.List.Properties
 
+ListMonoid : Set -> Monoid
+ListMonoid X = 
+  record
+  { Carrier = List X 
+      ; _∙_ = _++_ 
+      ; ε = [] 
+      ; lid = refl 
+      ; rid = λ {x} → ++-identityʳ x 
+      ; assoc = λ {x} {y} {z} → ++-assoc x y z 
+  }
 
 --------------------------------------------------
 
